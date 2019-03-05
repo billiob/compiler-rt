@@ -55,7 +55,9 @@
 #endif
 
 #if !SANITIZER_ANDROID
+#if defined(__GLIBC__)
 #include <fstab.h>
+#endif
 #include <sys/mount.h>
 #include <sys/timeb.h>
 #include <utmpx.h>
@@ -108,12 +110,16 @@ typedef struct user_fpregs elf_fpregset_t;
 
 #if SANITIZER_LINUX && !SANITIZER_ANDROID
 #include <glob.h>
+#if defined(__GLIBC__)
 #include <obstack.h>
+#endif
 #include <mqueue.h>
+#if defined(__GLIBC__)
 #include <net/if_ppp.h>
 #include <netax25/ax25.h>
 #include <netipx/ipx.h>
 #include <netrom/netrom.h>
+#endif
 #if HAVE_RPC_XDR_H
 # include <rpc/xdr.h>
 #elif HAVE_TIRPC_RPC_XDR_H
@@ -199,7 +205,9 @@ namespace __sanitizer {
 #endif // SANITIZER_MAC && !SANITIZER_IOS
 
 #if !SANITIZER_ANDROID
+#if defined(__GLIBC__)
   unsigned struct_fstab_sz = sizeof(struct fstab);
+#endif
   unsigned struct_statfs_sz = sizeof(struct statfs);
   unsigned struct_sockaddr_sz = sizeof(struct sockaddr);
   unsigned ucontext_t_sz = sizeof(ucontext_t);
@@ -296,7 +304,9 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
 
 #if SANITIZER_LINUX && !SANITIZER_ANDROID
   int glob_nomatch = GLOB_NOMATCH;
+#if defined(__GLIBC__)
   int glob_altdirfunc = GLOB_ALTDIRFUNC;
+#endif
 #endif
 
 #if SANITIZER_LINUX && !SANITIZER_ANDROID && \
@@ -413,7 +423,9 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned struct_input_id_sz = sizeof(struct input_id);
   unsigned struct_mtpos_sz = sizeof(struct mtpos);
   unsigned struct_rtentry_sz = sizeof(struct rtentry);
+#if defined(__GLIBC__)
   unsigned struct_termio_sz = sizeof(struct termio);
+#endif
   unsigned struct_vt_consize_sz = sizeof(struct vt_consize);
   unsigned struct_vt_sizes_sz = sizeof(struct vt_sizes);
   unsigned struct_vt_stat_sz = sizeof(struct vt_stat);
@@ -439,41 +451,54 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
 #endif // SANITIZER_LINUX
 
 #if SANITIZER_LINUX && !SANITIZER_ANDROID
+#if defined(__GLIBC__)
   unsigned struct_ax25_parms_struct_sz = sizeof(struct ax25_parms_struct);
+#endif
   unsigned struct_cyclades_monitor_sz = sizeof(struct cyclades_monitor);
 #if EV_VERSION > (0x010000)
   unsigned struct_input_keymap_entry_sz = sizeof(struct input_keymap_entry);
 #else
   unsigned struct_input_keymap_entry_sz = 0;
 #endif
+#if defined(__GLIBC__)
   unsigned struct_ipx_config_data_sz = sizeof(struct ipx_config_data);
+#endif
   unsigned struct_kbdiacrs_sz = sizeof(struct kbdiacrs);
   unsigned struct_kbentry_sz = sizeof(struct kbentry);
   unsigned struct_kbkeycode_sz = sizeof(struct kbkeycode);
   unsigned struct_kbsentry_sz = sizeof(struct kbsentry);
   unsigned struct_mtconfiginfo_sz = sizeof(struct mtconfiginfo);
+#if defined(__GLIBC__)
   unsigned struct_nr_parms_struct_sz = sizeof(struct nr_parms_struct);
+#endif
   unsigned struct_scc_modem_sz = sizeof(struct scc_modem);
   unsigned struct_scc_stat_sz = sizeof(struct scc_stat);
   unsigned struct_serial_multiport_struct_sz
       = sizeof(struct serial_multiport_struct);
   unsigned struct_serial_struct_sz = sizeof(struct serial_struct);
+#if defined(__GLIBC__)
   unsigned struct_sockaddr_ax25_sz = sizeof(struct sockaddr_ax25);
+#endif
   unsigned struct_unimapdesc_sz = sizeof(struct unimapdesc);
   unsigned struct_unimapinit_sz = sizeof(struct unimapinit);
 #endif // SANITIZER_LINUX && !SANITIZER_ANDROID
 
 #if SANITIZER_LINUX && !SANITIZER_ANDROID
   unsigned struct_audio_buf_info_sz = sizeof(struct audio_buf_info);
+#if defined(__GLIBC__)
   unsigned struct_ppp_stats_sz = sizeof(struct ppp_stats);
+#endif
 #endif // (SANITIZER_LINUX || SANITIZER_FREEBSD) && !SANITIZER_ANDROID
 
 #if !SANITIZER_ANDROID && !SANITIZER_MAC
   unsigned struct_sioc_sg_req_sz = sizeof(struct sioc_sg_req);
   unsigned struct_sioc_vif_req_sz = sizeof(struct sioc_vif_req);
 #endif
-
+#if defined(BUFSIZ)
   const unsigned long __sanitizer_bufsiz = BUFSIZ;
+#else
+  const unsigned long __sanitizer_bufsiz = 8192;
+#endif
 
   const unsigned IOCTL_NOT_PRESENT = 0;
 
@@ -617,6 +642,7 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned IOCTL_HDIO_SET_NOWERR = HDIO_SET_NOWERR;
   unsigned IOCTL_HDIO_SET_UNMASKINTR = HDIO_SET_UNMASKINTR;
   unsigned IOCTL_MTIOCPOS = MTIOCPOS;
+#if defined(__GLIBC__)
   unsigned IOCTL_PPPIOCGASYNCMAP = PPPIOCGASYNCMAP;
   unsigned IOCTL_PPPIOCGDEBUG = PPPIOCGDEBUG;
   unsigned IOCTL_PPPIOCGFLAGS = PPPIOCGFLAGS;
@@ -628,6 +654,19 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned IOCTL_PPPIOCSMAXCID = PPPIOCSMAXCID;
   unsigned IOCTL_PPPIOCSMRU = PPPIOCSMRU;
   unsigned IOCTL_PPPIOCSXASYNCMAP = PPPIOCSXASYNCMAP;
+#else
+  unsigned IOCTL_PPPIOCGASYNCMAP = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCGDEBUG = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCGFLAGS = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCGUNIT = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCGXASYNCMAP = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCSASYNCMAP = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCSDEBUG = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCSFLAGS = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCSMAXCID = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCSMRU = IOCTL_NOT_PRESENT;
+  unsigned IOCTL_PPPIOCSXASYNCMAP = IOCTL_NOT_PRESENT;
+#endif
   unsigned IOCTL_SIOCADDRT = SIOCADDRT;
   unsigned IOCTL_SIOCDARP = SIOCDARP;
   unsigned IOCTL_SIOCDELRT = SIOCDELRT;
@@ -876,6 +915,7 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned IOCTL_SCSI_IOCTL_PROBE_HOST = SCSI_IOCTL_PROBE_HOST;
   unsigned IOCTL_SCSI_IOCTL_TAGGED_DISABLE = SCSI_IOCTL_TAGGED_DISABLE;
   unsigned IOCTL_SCSI_IOCTL_TAGGED_ENABLE = SCSI_IOCTL_TAGGED_ENABLE;
+#if defined(__GLIBC__)
   unsigned IOCTL_SIOCAIPXITFCRT = SIOCAIPXITFCRT;
   unsigned IOCTL_SIOCAIPXPRISLT = SIOCAIPXPRISLT;
   unsigned IOCTL_SIOCAX25ADDUID = SIOCAX25ADDUID;
@@ -884,12 +924,15 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned IOCTL_SIOCAX25GETUID = SIOCAX25GETUID;
   unsigned IOCTL_SIOCAX25NOUID = SIOCAX25NOUID;
   unsigned IOCTL_SIOCAX25SETPARMS = SIOCAX25SETPARMS;
+#endif
   unsigned IOCTL_SIOCDEVPLIP = SIOCDEVPLIP;
+#if defined(__GLIBC__)
   unsigned IOCTL_SIOCIPXCFGDATA = SIOCIPXCFGDATA;
   unsigned IOCTL_SIOCNRDECOBS = SIOCNRDECOBS;
   unsigned IOCTL_SIOCNRGETPARMS = SIOCNRGETPARMS;
   unsigned IOCTL_SIOCNRRTCTL = SIOCNRRTCTL;
   unsigned IOCTL_SIOCNRSETPARMS = SIOCNRSETPARMS;
+#endif
   unsigned IOCTL_TIOCGSERIAL = TIOCGSERIAL;
   unsigned IOCTL_TIOCSERGETMULTI = TIOCSERGETMULTI;
   unsigned IOCTL_TIOCSERSETMULTI = TIOCSERSETMULTI;
@@ -960,7 +1003,7 @@ CHECK_SIZE_AND_OFFSET(dl_phdr_info, dlpi_phdr);
 CHECK_SIZE_AND_OFFSET(dl_phdr_info, dlpi_phnum);
 #endif // SANITIZER_LINUX || SANITIZER_FREEBSD
 
-#if (SANITIZER_LINUX || SANITIZER_FREEBSD) && !SANITIZER_ANDROID
+#if ((SANITIZER_LINUX && defined(__GLIBC__)) || SANITIZER_FREEBSD) && !SANITIZER_ANDROID
 CHECK_TYPE_SIZE(glob_t);
 CHECK_SIZE_AND_OFFSET(glob_t, gl_pathc);
 CHECK_SIZE_AND_OFFSET(glob_t, gl_pathv);
@@ -1122,8 +1165,12 @@ CHECK_TYPE_SIZE(ipc_perm);
 CHECK_SIZE_AND_OFFSET(ipc_perm, key);
 CHECK_SIZE_AND_OFFSET(ipc_perm, seq);
 # else
+#  if defined(__GLIBC__)
 CHECK_SIZE_AND_OFFSET(ipc_perm, __key);
 CHECK_SIZE_AND_OFFSET(ipc_perm, __seq);
+#  else
+CHECK_SIZE_AND_OFFSET(ipc_perm, __ipc_perm_key);
+#  endif
 # endif
 CHECK_SIZE_AND_OFFSET(ipc_perm, uid);
 CHECK_SIZE_AND_OFFSET(ipc_perm, gid);
@@ -1177,7 +1224,7 @@ CHECK_SIZE_AND_OFFSET(ifaddrs, ifa_dstaddr);
 CHECK_SIZE_AND_OFFSET(ifaddrs, ifa_data);
 #endif
 
-#if SANITIZER_LINUX
+#if SANITIZER_LINUX && defined(__GLIBC__)
 COMPILER_CHECK(sizeof(__sanitizer_struct_mallinfo) == sizeof(struct mallinfo));
 #endif
 
@@ -1227,7 +1274,7 @@ COMPILER_CHECK(__sanitizer_XDR_DECODE == XDR_DECODE);
 COMPILER_CHECK(__sanitizer_XDR_FREE == XDR_FREE);
 #endif
 
-#if SANITIZER_LINUX && !SANITIZER_ANDROID
+#if SANITIZER_LINUX && !SANITIZER_ANDROID && defined(__GLIBC__)
 COMPILER_CHECK(sizeof(__sanitizer_FILE) <= sizeof(FILE));
 CHECK_SIZE_AND_OFFSET(FILE, _flags);
 CHECK_SIZE_AND_OFFSET(FILE, _IO_read_ptr);
@@ -1246,7 +1293,7 @@ CHECK_SIZE_AND_OFFSET(FILE, _chain);
 CHECK_SIZE_AND_OFFSET(FILE, _fileno);
 #endif
 
-#if SANITIZER_LINUX && !SANITIZER_ANDROID
+#if SANITIZER_LINUX && !SANITIZER_ANDROID && defined(__GLIBC__)
 COMPILER_CHECK(sizeof(__sanitizer__obstack_chunk) <= sizeof(_obstack_chunk));
 CHECK_SIZE_AND_OFFSET(_obstack_chunk, limit);
 CHECK_SIZE_AND_OFFSET(_obstack_chunk, prev);

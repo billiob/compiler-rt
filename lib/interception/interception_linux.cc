@@ -43,7 +43,7 @@ bool GetRealFunctionAddress(const char *func_name, uptr *func_addr,
 }
 
 // Android and Solaris do not have dlvsym
-#if !SANITIZER_ANDROID && !SANITIZER_SOLARIS && !SANITIZER_OPENBSD
+#if (!SANITIZER_ANDROID && !SANITIZER_SOLARIS && !SANITIZER_OPENBSD) && (!SANITIZER_LINUX || (SANITIZER_LINUX && defined(__GLIBC__)))
 void *GetFuncAddrVer(const char *func_name, const char *ver) {
   return dlvsym(RTLD_NEXT, func_name, ver);
 }

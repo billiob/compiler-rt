@@ -193,7 +193,11 @@ namespace __sanitizer {
   extern unsigned struct_statvfs64_sz;
 
   struct __sanitizer_ipc_perm {
+#if defined(__GLIBC__)
     int __key;
+#else
+    int __ipc_perm_key;
+#endif
     int uid;
     int gid;
     int cuid;
@@ -222,16 +226,25 @@ namespace __sanitizer {
     unsigned long __unused1;
     unsigned long __unused2;
 #else
+# if defined(__GLIBC__)
     unsigned short mode;
     unsigned short __pad1;
     unsigned short __seq;
     unsigned short __pad2;
+# else
+    unsigned mode;
+    int __ipc_perm_seq;
+    long __pad1;
+    long __pad2;
+# endif
 #if defined(__x86_64__) && !defined(_LP64)
     u64 __unused1;
     u64 __unused2;
 #else
+# if defined(__GLIBC__)
     unsigned long __unused1;
     unsigned long __unused2;
+# endif
 #endif
 #endif
   };
@@ -455,13 +468,42 @@ namespace __sanitizer {
     void *msg_name;
     unsigned msg_namelen;
     struct __sanitizer_iovec *msg_iov;
+// TODO: better check
+#if defined(__GLIBC__)
     uptr msg_iovlen;
+#else
+#if defined(__DEFINED_socklen_t)
+    socklen_t msg_iovlen, __pad1;
+#else
+    unsigned msg_iovlen, __pad1;
+#endif
+#endif
     void *msg_control;
+// TODO: better check
+#if defined(__GLIBC__)
     uptr msg_controllen;
+#else
+#if defined(__DEFINED_socklen_t)
+    socklen_t msg_controllen, __pad2;
+#else
+    unsigned msg_controllen, __pad2;
+#endif
+#endif
     int msg_flags;
   };
   struct __sanitizer_cmsghdr {
+// TODO: better check
+#if defined(__GLIBC__)
     uptr cmsg_len;
+#else
+#if defined(__DEFINED_socklen_t)
+    socklen_t cmsg_len;
+    int __pad1;
+#else
+    unsigned cmsg_len;
+    int __pad1;
+#endif
+#endif
     int cmsg_level;
     int cmsg_type;
   };
@@ -961,7 +1003,9 @@ struct __sanitizer_cookie_io_functions_t {
   extern unsigned struct_input_absinfo_sz;
   extern unsigned struct_input_id_sz;
   extern unsigned struct_mtpos_sz;
+#if defined(__GLIBC__)
   extern unsigned struct_termio_sz;
+#endif
   extern unsigned struct_vt_consize_sz;
   extern unsigned struct_vt_sizes_sz;
   extern unsigned struct_vt_stat_sz;

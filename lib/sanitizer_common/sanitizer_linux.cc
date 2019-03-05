@@ -28,7 +28,9 @@
 #include "sanitizer_procmaps.h"
 
 #if SANITIZER_LINUX
+#if defined(__GLIBC__)
 #include <asm/param.h>
+#endif
 #endif
 
 // For mips64, syscall(__NR_stat) fills the buffer in the 'struct kernel_stat'
@@ -1082,7 +1084,11 @@ uptr GetPageSize() {
 #if SANITIZER_ANDROID
   return 4096;
 #elif SANITIZER_LINUX && (defined(__x86_64__) || defined(__i386__))
+#if defined(PAGESIZE)
+  return PAGESIZE;
+#else
   return EXEC_PAGESIZE;
+#endif
 #elif SANITIZER_USE_GETAUXVAL
   return getauxval(AT_PAGESZ);
 #elif SANITIZER_FREEBSD || SANITIZER_NETBSD

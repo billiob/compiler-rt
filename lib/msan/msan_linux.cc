@@ -27,7 +27,9 @@
 #include <signal.h>
 #include <unistd.h>
 #include <unwind.h>
+#if !SANITIZER_LINUX || defined(__GLIBC__)
 #include <execinfo.h>
+#endif
 #include <sys/time.h>
 #include <sys/resource.h>
 

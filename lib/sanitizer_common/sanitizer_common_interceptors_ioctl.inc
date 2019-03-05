@@ -331,13 +331,17 @@ static void ioctl_table_fill() {
   _(SOUND_PCM_WRITE_CHANNELS, WRITE, sizeof(int));
   _(SOUND_PCM_WRITE_FILTER, WRITE, sizeof(int));
   _(TCFLSH, NONE, 0);
+#if defined(__GLIBC__)
   _(TCGETA, WRITE, struct_termio_sz);
+#endif
   _(TCGETS, WRITE, struct_termios_sz);
   _(TCSBRK, NONE, 0);
   _(TCSBRKP, NONE, 0);
+#if defined(__GLIBC__)
   _(TCSETA, READ, struct_termio_sz);
   _(TCSETAF, READ, struct_termio_sz);
   _(TCSETAW, READ, struct_termio_sz);
+#endif
   _(TCSETS, READ, struct_termios_sz);
   _(TCSETSF, READ, struct_termios_sz);
   _(TCSETSW, READ, struct_termios_sz);
